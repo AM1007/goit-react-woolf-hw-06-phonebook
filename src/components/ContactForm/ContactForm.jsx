@@ -1,18 +1,36 @@
 import { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { addContacts } from 'redux/contacts/slice';
+import { getContacts } from 'redux/contacts/selectors';
 import { nanoid } from 'nanoid';
+import css from './ContactForm.module.css';
 
-import { Form, Label, Input, ButtonForm } from './ContactForm.styled';
-
-export function ContactForm({ onSubmit }) {
+export default function ContactForm() {
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
 
-  let NameInputId = nanoid();
-  let NumberInputId = nanoid();
+  const contacts = useSelector(getContacts);
+  const dispatch = useDispatch();
 
-  const handleInputChange = evt => {
-    const { name, value } = evt.currentTarget;
+  const handleSubmit = e => {
+    e.preventDefault();
 
+    contacts.some(contact => contact.name === name)
+      ? alert(`${name} is already in contacts`)
+      : dispatch(
+          addContacts({
+            id: nanoid(),
+            name: name,
+            number: number,
+          })
+        );
+
+    setName('');
+    setNumber('');
+  };
+
+  const handleChange = evt => {
+    const { name, value } = evt.target;
     switch (name) {
       case 'name':
         setName(value);
@@ -27,47 +45,45 @@ export function ContactForm({ onSubmit }) {
     }
   };
 
-  const reset = () => {
-    setName('');
-    setNumber('');
-  };
-  const handleSubmit = evt => {
-    evt.preventDefault();
-    onSubmit({ name, number });
-    reset();
-  };
-
   return (
-    <Form onSubmit={handleSubmit}>
-      <Label htmlFor={NameInputId}>
-        Name
-        <Input
-          onChange={handleInputChange}
-          value={name}
-          type="text"
-          name="name"
-          placeholder="Name"
-          id={NameInputId}
-          pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
-          title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
-          required
-        />
-      </Label>
-      <Label htmlFor={NumberInputId}>
-        Number
-        <Input
-          value={number}
-          onChange={handleInputChange}
-          type="tel"
-          name="number"
-          placeholder="Number"
-          id={NumberInputId}
-          pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
-          title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
-          required
-        />
-      </Label>
-      <ButtonForm type="submit">Add contact</ButtonForm>
-    </Form>
+    <>
+      <h2 className={css.headline}>Phonebook</h2>
+      <div className={css.container}>
+        <form className={css.form} onSubmit={handleSubmit}>
+          <label className={css.label}>
+            Name
+            <input
+              className={css.input}
+              type="text"
+              name="name"
+              value={name}
+              placeholder="Enter the Name"
+              pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
+              title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
+              onChange={handleChange}
+              required
+            />
+          </label>
+          <label className={css.label}>
+            Number
+            <input
+              className={css.input}
+              type="tel"
+              name="number"
+              value={number}
+              placeholder="Enter the Number"
+              pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
+              title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
+              onChange={handleChange}
+              required
+            />
+          </label>
+
+          <button className={css.button} type="submit">
+            Add contact
+          </button>
+        </form>
+      </div>
+    </>
   );
 }
