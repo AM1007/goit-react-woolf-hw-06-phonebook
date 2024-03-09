@@ -1,5 +1,5 @@
 import React from 'react';
-import propTypes from 'prop-types';
+
 import {
   ContactListUl,
   ContactListLi,
@@ -20,13 +20,3 @@ export const ContactList = ({ contacts, deleteContact }) => (
     ))}
   </ContactListUl>
 );
-ContactList.propTypes = {
-  deleteContact: propTypes.func.isRequired,
-  contacts: propTypes.arrayOf(
-    propTypes.exact({
-      id: propTypes.string.isRequired,
-      name: propTypes.string.isRequired,
-      number: propTypes.string.isRequired,
-    })
-  ),
-};
